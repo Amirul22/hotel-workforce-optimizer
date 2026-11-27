@@ -326,7 +326,88 @@ with tab1:
 
 with tab2:
 
-    workforce_df = pd.DataFrame({
+    st.header("Rooms & F&B Workforce Forecast")
+
+    rooms_payroll_pct = (
+        rooms_labor_cost /
+        rooms_revenue
+    ) * 100
+
+    fb_payroll_pct = (
+        fb_labor_cost /
+        fb_revenue
+    ) * 100
+
+    # =========================
+    # ROOMS
+    # =========================
+
+    r1, r2 = st.columns(2)
+
+    with r1:
+
+        st.subheader("🏨 Rooms Division")
+
+        st.metric(
+            "Rooms Revenue",
+            f"${rooms_revenue:,.0f}"
+        )
+
+        st.metric(
+            "Rooms Hours",
+            f"{rooms_hours:,.0f}"
+        )
+
+        st.metric(
+            "Rooms Labor Cost",
+            f"${rooms_labor_cost:,.0f}"
+        )
+
+        st.metric(
+            "Rooms Payroll %",
+            f"{rooms_payroll_pct:.1f}%"
+        )
+
+    # =========================
+    # F&B
+    # =========================
+
+    with r2:
+
+        st.subheader("🍽️ F&B Division")
+
+        st.metric(
+            "F&B Revenue",
+            f"${fb_revenue:,.0f}"
+        )
+
+        st.metric(
+            "F&B Hours",
+            f"{fb_hours:,.0f}"
+        )
+
+        st.metric(
+            "F&B Labor Cost",
+            f"${fb_labor_cost:,.0f}"
+        )
+
+        st.metric(
+            "F&B Payroll %",
+            f"{fb_payroll_pct:.1f}%"
+        )
+
+    st.divider()
+
+    # =========================
+    # HOURS TABLE
+    # =========================
+
+    st.subheader(
+        "Department Labor Hours"
+    )
+
+    department_hours = pd.DataFrame({
+
         "Department":[
             "Housekeeping",
             "Front Office",
@@ -334,6 +415,7 @@ with tab2:
             "Restaurant",
             "Bars"
         ],
+
         "Hours":[
             round(hk_hours),
             round(fo_hours),
@@ -344,8 +426,96 @@ with tab2:
     })
 
     st.dataframe(
-        workforce_df,
+        department_hours,
         use_container_width=True
+    )
+
+    st.bar_chart(
+        department_hours.set_index(
+            "Department"
+        )
+    )
+
+    st.divider()
+
+    # =========================
+    # PAYROLL TABLE
+    # =========================
+
+    st.subheader(
+        "Department Payroll Forecast"
+    )
+
+    department_payroll = pd.DataFrame({
+
+        "Department":[
+            "Housekeeping",
+            "Front Office",
+            "Kitchen",
+            "Restaurant",
+            "Bars"
+        ],
+
+        "Payroll":[
+            round(hk_hours * hk_rate),
+            round(fo_hours * fo_rate),
+            round(kitchen_hours * kitchen_rate),
+            round(restaurant_hours * restaurant_rate),
+            round(bar_hours * bar_rate)
+        ]
+    })
+
+    st.dataframe(
+        department_payroll,
+        use_container_width=True
+    )
+
+    st.bar_chart(
+        department_payroll.set_index(
+            "Department"
+        )
+    )
+
+    st.divider()
+
+    # =========================
+    # PRODUCTIVITY
+    # =========================
+
+    st.subheader(
+        "Productivity KPIs"
+    )
+
+    rooms_rev_per_hour = (
+        rooms_revenue /
+        rooms_hours
+    )
+
+    fb_rev_per_hour = (
+        fb_revenue /
+        fb_hours
+    )
+
+    hotel_rev_per_hour = (
+        total_revenue /
+        total_labor_hours
+    )
+
+    p1, p2, p3 = st.columns(3)
+
+    p1.metric(
+        "Rooms Rev / Hour",
+        f"${rooms_rev_per_hour:,.0f}"
+    )
+
+    p2.metric(
+        "F&B Rev / Hour",
+        f"${fb_rev_per_hour:,.0f}"
+    )
+
+    p3.metric(
+        "Hotel Rev / Hour",
+        f"${hotel_rev_per_hour:,.0f}"
     )
 
 # ====================================================
@@ -416,4 +586,38 @@ with tab4:
     st.metric(
         "GOP Improvement",
         f"${improvement:,.0f}"
+    )
+st.divider()
+
+st.subheader(
+    "Labor Optimization Recommendation"
+)
+
+if savings_required > 0:
+
+    hk_reduction = (
+        savings_required * 0.35
+    ) / hk_rate
+
+    kitchen_reduction = (
+        savings_required * 0.30
+    ) / kitchen_rate
+
+    restaurant_reduction = (
+        savings_required * 0.35
+    ) / restaurant_rate
+
+    st.write(
+        f"Housekeeping Reduction: "
+        f"{hk_reduction:.0f} hrs"
+    )
+
+    st.write(
+        f"Kitchen Reduction: "
+        f"{kitchen_reduction:.0f} hrs"
+    )
+
+    st.write(
+        f"Restaurant Reduction: "
+        f"{restaurant_reduction:.0f} hrs"
     )
